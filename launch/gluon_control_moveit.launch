@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="gluon_control_moveit" pkg="moveit_tutorials" type="gluon_control_moveit" respawn="false" output="screen">
+  </node>
+
+</launch>
