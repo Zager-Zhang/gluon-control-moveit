@@ -21,19 +21,19 @@ bool my_execute_plan(moveit::planning_interface::MoveGroupInterface &move_group,
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "rviz_sim");
+  ros::init(argc, argv, "gluon_control_moveit");
   ros::NodeHandle node_handle;
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
   /********设置********/
-
+  
   static const std::string PLANNING_GROUP = "gluon";
 
   //:planning_interface:`MoveGroupInterface` 类可以很容易地
   //仅使用您想要控制和计划的计划组的名称进行设置。
   moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
-
+  
   //我们将使用 :planning_interface:`PlanningSceneInterface`
   //在我们的“虚拟世界”场景中添加和删除碰撞对象的类
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     move_group.setMaxAccelerationScalingFactor(0.20);
 
     // 设置home位置
-    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to go to home");
+    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to << go to home >>");
     std::vector<double> joint_home_positions(6, 0.0);
     move_group.setJointValueTarget(joint_home_positions);
     ROS_INFO("Go to home");
@@ -90,16 +90,16 @@ int main(int argc, char** argv)
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     my_execute_plan(move_group,my_plan);
 
-    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
+    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to << move to pose1 >>");
 
     /********移动到一个目标位置********/
 
     // 设置目标位置
     geometry_msgs::Pose target_pose1;
-    target_pose1.orientation.w = 1.0;
+    target_pose1.orientation.w = 0;
     target_pose1.position.x = 0.20;
-    target_pose1.position.y = -0.15;
-    target_pose1.position.z = 0.22;
+    target_pose1.position.y = 0.20;
+    target_pose1.position.z = 0.20;
     move_group.setPoseTarget(target_pose1);
 
     my_execute_plan(move_group,my_plan);
@@ -113,8 +113,8 @@ int main(int argc, char** argv)
     visual_tools.publishText(text_pose, "Pose Goal", rvt::WHITE, rvt::XLARGE);
     visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
     visual_tools.trigger();
-    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-    
+    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to << move to pose2 >>");
+    #if 1
     move_group.setMaxVelocityScalingFactor(0.05);
     move_group.setMaxAccelerationScalingFactor(0.05);
 
@@ -145,10 +145,10 @@ int main(int argc, char** argv)
     target_pose3.position.x += 0.10;
     waypoints.push_back(target_pose3);  
 
-    target_pose3.position.y += 0.30;
+    target_pose3.position.y += 0.30;  // left
     waypoints.push_back(target_pose3);  
 
-    target_pose3.position.z += 0.20;
+    target_pose3.position.z += 0.20;  // up
     waypoints.push_back(target_pose3);  
 
     //我们希望以 1 cm 的分辨率对笛卡尔路径进行插值
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
     for (std::size_t i = 0; i < waypoints.size(); ++i)
       visual_tools.publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
     visual_tools.trigger();
-    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to << Cartesian motion planning >>");
 
     //笛卡尔运动通常应该很慢，例如接近物体时。笛卡尔速度
     //目前无法通过 maxVelocityScalingFactor 设置计划，但需要您计时
@@ -192,6 +192,7 @@ int main(int argc, char** argv)
     ros::Duration(2).sleep();
 
     ros::Duration(10).sleep();
+    #endif
   }
   ros::shutdown();
   return 0;
