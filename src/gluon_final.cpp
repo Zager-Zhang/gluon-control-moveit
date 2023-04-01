@@ -14,13 +14,13 @@
 // visual_tools
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
-#define pi 3.1415926
+#define pi acos(-1)
 
 double dh_theta[6] = {0,0,0,0,0,0};
-double dh_d[6] = {105.03 ,0 ,0 ,80.09 ,80.09 ,44.36};
-double dh_a[6] = {0 ,-174.42 ,-174.42 ,0 ,0};
-// double dh_d[6] = {120.5 ,0 ,0 ,79.2 ,79.2 ,8.23};
-// double dh_a[6] = {0 ,-203.5 ,-173 ,0 ,0};
+// double dh_d[6] = {105.03 ,0 ,0 ,80.09 ,80.09 ,44.36};
+// double dh_a[6] = {0 ,-174.42 ,-174.42 ,0 ,0};
+double dh_d[6] = {120.5 ,0 ,0 ,79.2 ,79.2 ,32.00};
+double dh_a[6] = {0 ,-203.5 ,-173 ,0 ,0};
 double dh_alfa[6] = {pi/2 ,0 ,0 ,pi/2 ,-pi/2 ,0};
 double jointMat[8][6];
 bool is_solution[8];
@@ -175,7 +175,11 @@ int main(int argc, char *argv[])
     ros::AsyncSpinner spinner(1);
     spinner.start();
     
-    /* ---------------配置--------------- */
+    int posx,posy,posz;
+    ros::param::get("gluon_final/posx",posx);
+    ros::param::get("gluon_final/posy",posy);
+    ros::param::get("gluon_final/posz",posz);
+    /* ---------------moveit配置--------------- */
     // move group
     static const std::string PLANNING_GROUP = "gluon";
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
@@ -214,7 +218,7 @@ int main(int argc, char *argv[])
     /*---------------Step3: 设置目标并求逆解（数值解）---------------*/ 
     // // 设置目标位姿
     // Eigen::Vector3d trans;
-    // trans <<  0.2,0.2,0.2;
+    // trans <<  0.15,0.15,0.45;
     // Eigen::Isometry3d target_state = Eigen::Isometry3d::Identity();
     // target_state.pretranslate(trans);
 
@@ -244,7 +248,7 @@ int main(int argc, char *argv[])
     /*---------------Step5: 求解析解---------------*/
     visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to << 解析解 >>");
 
-    poseMatrix(poseMat,pi/2,0,0,200,200,350);
+    poseMatrix(poseMat,0,0,0,posx,posy,posz);
     invKinematics(poseMat,is_solution);
     for(int i=0;i<8;i++)
         for(int j=0;j<6;j++)
@@ -266,7 +270,6 @@ int main(int argc, char *argv[])
             my_execute_plan(move_group,my_plan);
         }
     }
-    
     ros::shutdown();
     return 0;
 }

@@ -9,5 +9,7 @@
         respawn="false" output="screen">
     <rosparam command="load"
               file="$(find gluon_moveit_config)/config/kinematics.yaml"/>
+    <rosparam command="load"
+              file="$(find moveit_tutorials)/examples/gluon_control_moveit/config/gluon_final.yaml"/>
   </node>
 </launch>
